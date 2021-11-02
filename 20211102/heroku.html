@@ -1,0 +1,108 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="robots" content="index, follow">
+		<title>Heroku MQTT(CloudMQTT) Test</title>
+		<!-- cdn javascript and css -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/3.0.0/mqtt.min.js"></script>
+		<script src="//code.jquery.com/jquery-3.1.1.min.js" type="text/javascript"></script>
+		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+	</head>
+	<body>
+		<div class="container">
+			<script>
+			const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
+			const host = 'wss://driver.cloudmqtt.com:38687';
+			const options = {
+				keepalive: 10,
+				clientId: clientId,
+				protocolId: 'MQTT',
+				protocolVersion: 4,
+				username: 'test',
+				password: '12345',
+				clean: true
+			};
+			const client = mqtt.connect(host, options);
+			client.on('connect', () => {
+				$(".console").prepend($("<li/>").html(new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false, timeZone:'Asia/Taipei'}) + ' - Connected to MQTT server'));
+				client.subscribe('iot/#', { qos: 0 });
+				client.publish('iot/web-client', 'web client is online', { qos: 0, retain: false });
+				//client.end();
+			});
+			client.on('message', (topic, message, packet) => {
+				$(".console").prepend($("<li/>").html(new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false, timeZone:'Asia/Taipei'}) + " - [<span style='color:green'>" + topic + "</span>] <span style='color:blue'>" + message.toString() + "</span>"));
+			});
+			client.on('error', (err) => {
+				$(".console").prepend($("<li/>").html(new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false, timeZone:'Asia/Taipei'}) + ' - Connection error'));
+				client.end();
+			});
+			client.on('reconnect', () => {
+				//$(".console").prepend($("<li/>").html('Reconnecting...'));
+			});
+			function publish_dv(device, power) {
+				var uid = $("#uid").val();
+				client.publish('iot/' + uid, device + "." + power, { qos: 0, retain: false });
+			}
+			function publish_data() {
+				var uid = $("#uid").val();
+				var device = $("#device").val();
+				var power = $("#power").val();
+				client.publish('iot/' + uid, device + "." + power, { qos: 0, retain: false });
+			}
+			</script>
+			<h1>Heroku MQTT(CloudMQTT) Test</h1>
+			<hr>
+			<table border="0" width="100%">
+				<tr>
+					<td width="280">
+						<div>
+							裝置:<BR>
+							<input class="input input-sm" id="uid" type="input" value="a1"><BR>
+							控制:<BR>
+							<select class="input input-sm" id="device">
+								<option value="1">加熱裝置</option>
+								<option value="2">降溫裝置</option>
+							</select>
+							<input class="input input-sm" id="power" type="number" value="0" max="100" min="0">
+							<button class="btn btn-primary btn-sm" onclick="publish_data()">發送指令</button>
+						</div>
+					</td>
+					<td>
+						<div style="font-family:monospace;">
+							加熱:<br>
+							<button class="btn btn-danger btn-sm" onclick="publish_dv(1, 0)">0%</button>
+							<button class="btn btn-danger btn-sm" onclick="publish_dv(1, 10)">10%</button>
+							<button class="btn btn-danger btn-sm" onclick="publish_dv(1, 20)">20%</button>
+							<button class="btn btn-danger btn-sm" onclick="publish_dv(1, 30)">30%</button>
+							<button class="btn btn-danger btn-sm" onclick="publish_dv(1, 40)">40%</button>
+							<button class="btn btn-danger btn-sm" onclick="publish_dv(1, 50)">50%</button>
+							<button class="btn btn-danger btn-sm" onclick="publish_dv(1, 60)">60%</button>
+							<button class="btn btn-danger btn-sm" onclick="publish_dv(1, 70)">70%</button>
+							<button class="btn btn-danger btn-sm" onclick="publish_dv(1, 80)">80%</button>
+							<button class="btn btn-danger btn-sm" onclick="publish_dv(1, 90)">90%</button>
+							<button class="btn btn-danger btn-sm" onclick="publish_dv(1, 100)">100%</button><br>
+							散熱:<br>
+							<button class="btn btn-primary btn-sm" onclick="publish_dv(2, 0)">0%</button>
+							<button class="btn btn-primary btn-sm" onclick="publish_dv(2, 10)">10%</button>
+							<button class="btn btn-primary btn-sm" onclick="publish_dv(2, 20)">20%</button>
+							<button class="btn btn-primary btn-sm" onclick="publish_dv(2, 30)">30%</button>
+							<button class="btn btn-primary btn-sm" onclick="publish_dv(2, 40)">40%</button>
+							<button class="btn btn-primary btn-sm" onclick="publish_dv(2, 50)">50%</button>
+							<button class="btn btn-primary btn-sm" onclick="publish_dv(2, 60)">60%</button>
+							<button class="btn btn-primary btn-sm" onclick="publish_dv(2, 70)">70%</button>
+							<button class="btn btn-primary btn-sm" onclick="publish_dv(2, 80)">80%</button>
+							<button class="btn btn-primary btn-sm" onclick="publish_dv(2, 90)">90%</button>
+							<button class="btn btn-primary btn-sm" onclick="publish_dv(2, 100)">100%</button>
+						</div>
+					</td>
+				</tr>
+			</table>
+			<hr>
+			<div class="console" style="font-family:monospace;"></div>
+		</div>
+	</body>
+</html>
