@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="robots" content="index, follow">
+		<title>20211018 - 專題指導(物聯網雲端應用)</title>
+		<!-- cdn javascript and css -->
+		<script src="//code.jquery.com/jquery-3.1.1.min.js" type="text/javascript"></script>
+		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style>
+		pre {
+			padding:5px;
+			font-family:monospace;
+			font-size:12px;
+		}
+		.blue {
+			color:blue;
+		}
+		.commit {
+			color:#888;
+		}
+		.yellow {
+			color:yellow;
+		}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>專題指導(物聯網雲端應用)</h1>
+			<p>2021/10/18 HCYang</p>
+			<hr>
+			<div class="h3" style="display:flex;align-items:center;"><img src="https://i.imgur.com/sDSInju.png" style="width:1em;vertical-align:middle">&nbsp;MQTT控溫程式(接收端)</div>
+			<p style="color:blue;"><b>A. Adafruit.io</b></p>
+			<ul>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#a1" role="button" aria-expanded="false" aria-controls="a1">A-1. Arduino IDE 安裝擴充套件 PubSubClient</a></b></p>
+				<div class="collapse" id="a1"><img src="https://i.imgur.com/mIFMtX0.jpg" width="100%" style="max-width:780px;"></div>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#a2" role="button" aria-expanded="false" aria-controls="a2">A-2. Arduino IDE 開發板管理員安裝 esp8266</a></b></p>
+				<div class="collapse" id="a2"><img src="https://i.imgur.com/qreY4fY.jpg" width="100%" style="max-width:780px;"></div>
+				<p><b><a class="btn btn-xs btn-danger" data-toggle="collapse" href="#a3" role="button" aria-expanded="false" aria-controls="a3">A-3. NodeMCU(ESP12) Subscribe Message to UART</a></b></p>
+<pre style="background:#efe;color:#111;" class="collapse" id="a3">
+#include &lt;ESP8266WiFi.h&gt;
+#include &lt;PubSubClient.h&gt;
+
+<span class="commit"><i>// WiFi</i></span>
+const char *ssid = "<span class="blue">CueMei</span>";           <span class="commit"><i>// WiFi ssid</i></span>
+const char *password = "<span class="blue">123456789</span>";    <span class="commit"><i>// WiFi password</i></span>
+
+<span class="commit"><i>// MQTT Broker</i></span>
+const char *mqtt_broker = "io.adafruit.com";
+const char *topic = "<span class="blue">hcyang0207/feeds/home.control</span>";
+const char *mqtt_username = "<span class="blue">hcyang0207</span>";
+const char *mqtt_password = "<span class="blue">aio_BKwE178y7NDTg4K651**********</span>";
+const int mqtt_port = 1883;
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void setup() {
+    Serial.begin(9600);
+    <span class="commit"><i>// connecting to a WiFi network</i></span>
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        <span class="commit"><i>// Serial.println("Connecting to WiFi..");</i></span>
+    }
+    <span class="commit"><i>// Serial.println("Connected to the WiFi network");</i></span>
+    <span class="commit"><i>// connecting to a mqtt broker</i></span>
+    client.setServer(mqtt_broker, mqtt_port);
+    client.setCallback(callback);
+    while (!client.connected()) {
+        String client_id = "esp8266-client-";
+        client_id += String(WiFi.macAddress());
+        <span class="commit"><i>// Serial.printf("The client %s connects to the public mqtt broker\n", client_id.c_str());</i></span>
+        if (client.connect(client_id.c_str(), mqtt_username, mqtt_password)) {
+            <span class="commit"><i>// Serial.println("Public mqtt broker connected");</i></span>
+        } else {
+            <span class="commit"><i>// Serial.print("failed with state ");</i></span>
+            <span class="commit"><i>// Serial.print(client.state());</i></span>
+            delay(2000);
+        }
+    }
+    <span class="commit"><i>// publish and subscribe</i></span>
+    client.publish(topic, "device is online");
+    client.subscribe(topic);
+}
+
+void callback(char *topic, byte *payload, unsigned int length) {
+    char strarr[length];
+    for (int i = 0; i &lt; length; i++) {
+        strarr[i] = (char) payload[i];
+    }
+    Serial.println(strarr);
+}
+
+void loop() {
+    client.loop();
+}
+</pre>
+				<p><b><a class="btn btn-xs btn-warning" data-toggle="collapse" href="#a4" role="button" aria-expanded="false" aria-controls="a4">A-4. mosquitto-client 傳送控制指令 Publish</a></b></p>
+<pre style="background:#000;color:#999;" class="collapse" id="a4">
+root@localhost:~# sudo mosquitto_pub -h io.adafruit.com -p 1883 -u <span class="yellow">hcyang0207</span> -P <span class="yellow">aio_BKwE178y7NDTg4K651**********</span> -t "<span class="yellow">hcyang0207/feeds/home.control</span>" -m "<span class="yellow">1.50</span>"
+root@localhost:~# sudo mosquitto_pub -h io.adafruit.com -p 1883 -u <span class="yellow">hcyang0207</span> -P <span class="yellow">aio_BKwE178y7NDTg4K651**********</span> -t "<span class="yellow">hcyang0207/feeds/home.control</span>" -m "<span class="yellow">1.70</span>"
+root@localhost:~# sudo mosquitto_pub -h io.adafruit.com -p 1883 -u <span class="yellow">hcyang0207</span> -P <span class="yellow">aio_BKwE178y7NDTg4K651**********</span> -t "<span class="yellow">hcyang0207/feeds/home.control</span>" -m "<span class="yellow">1.20</span>"
+root@localhost:~# sudo mosquitto_pub -h io.adafruit.com -p 1883 -u <span class="yellow">hcyang0207</span> -P <span class="yellow">aio_BKwE178y7NDTg4K651**********</span> -t "<span class="yellow">hcyang0207/feeds/home.control</span>" -m "<span class="yellow">1.0</span>"
+root@localhost:~# sudo mosquitto_pub -h io.adafruit.com -p 1883 -u <span class="yellow">hcyang0207</span> -P <span class="yellow">aio_BKwE178y7NDTg4K651**********</span> -t "<span class="yellow">hcyang0207/feeds/home.control</span>" -m "<span class="yellow">2.50</span>"
+root@localhost:~# sudo mosquitto_pub -h io.adafruit.com -p 1883 -u <span class="yellow">hcyang0207</span> -P <span class="yellow">aio_BKwE178y7NDTg4K651**********</span> -t "<span class="yellow">hcyang0207/feeds/home.control</span>" -m "<span class="yellow">2.100</span>"
+root@localhost:~# sudo mosquitto_pub -h io.adafruit.com -p 1883 -u <span class="yellow">hcyang0207</span> -P <span class="yellow">aio_BKwE178y7NDTg4K651**********</span> -t "<span class="yellow">hcyang0207/feeds/home.control</span>" -m "<span class="yellow">2.0</span>"
+</pre>
+				<p><b><a class="btn btn-xs btn-danger" data-toggle="collapse" href="#a5" role="button" aria-expanded="false" aria-controls="a5">A-5. Arduino Pro Mini 整流器端(加熱端)</a></b></p>
+<pre style="background:#efe;color:#111;" class="collapse" id="a5">
+#include &lt;TimerOne.h&gt;
+
+const byte pin = 5;                    <span class="commit"><i>// TRIAC 訊號輸出接腳</i></span>
+const byte trigPin = 3;                <span class="commit"><i>// TRIAC PIN 只能用pin2或3</i></span>
+volatile boolean zeroCross = false;    <span class="commit"><i>// 目前trig狀態(儲存零交越狀態的變數)</i></span>
+float dim = 64;  
+int i = 0;
+float dim_tmp = 0;
+String str = "";                       <span class="commit"><i>// 暫存輸入字串的變數</i></span>
+char chr;
+int val;
+String str_check = "<span class="blue">2.</span>";               <span class="commit"><i>// 控制組標頭(1 = 加熱, 2 = 降溫)</i></span>
+boolean str_flag = false;
+
+void setup() {
+    pinMode(pin, OUTPUT);
+    pinMode(trigPin, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(trigPin), zeroCrossISR, RISING);
+    Serial.begin(9600);
+    Timer1.initialize(65);    <span class="commit"><i>// 設定讓定時器每隔65微秒，自動執行dim_check函數。</i></span>
+    Timer1.attachInterrupt(dim_check);
+}
+
+void zeroCrossISR() {
+    zeroCross = true;      
+    i=0;
+    digitalWrite(pin, LOW);  <span class="commit"><i>// 關閉電源TRIAC</i></span>
+    dim = dim_tmp;
+}
+
+void dim_check() {
+    if (zeroCross) {                    <span class="commit"><i>// 若已經過零交越點....</i></span>
+        if (i &gt; 127 - dim) {            <span class="commit"><i>// 判斷是否過了延遲觸發時間...</i></span>
+            digitalWrite(pin, HIGH);    <span class="commit"><i>// 開啟TRIAC</i></span>
+            i = 0;                      <span class="commit"><i>// 重設「計數器」</i></span>
+            zeroCross = false;          <span class="commit"><i>// 零交越 flag</i></span>
+        } else {
+            i++;
+        }
+    }
+}
+
+void loop() {
+    while (Serial.available() &gt; 0) {
+        char chr = Serial.read();
+        if (chr != '\n'){
+            str += chr;         <span class="commit"><i>// 把字元連結成字串</i></span>
+        } else if(str != NULL) {
+            for(int i=0;i&lt;2;i++) {
+                if(str[i]!=str_check[i]) {
+                    Serial.print("Input data: ");
+                    dim_tmp = 0;
+                    Serial.println(dim_tmp);
+                    break;
+                }
+                if(i == 1) {
+                    str_flag == true;   
+                    str.remove(0,2);
+                    Serial.print("Input data: ");
+                    if(str.toInt() &lt;= 100 && str.toInt() &gt;= 0 && str != " " ) {
+                        Serial.println(str.toInt());   <span class="commit"><i>// 將字串轉換成數字</i></span>
+                        dim_tmp = str.toInt();
+                        dim_tmp = (dim_tmp/100)*128-1;
+                        str_flag = false;
+                    }
+                }
+            }
+            if(str_flag == true) {}
+            str = "";
+        }
+    }
+}
+</pre>
+			</ul>
+		</div>
+		<br><br><br><br><br><br><br><br>
+	</body>
+</html>

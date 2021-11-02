@@ -1,0 +1,11 @@
+RewriteEngine On
+RewriteRule ^1528271975600.jpg$ https://i.imgur.com/tY0BRpV.jpg [R=301,L]
+RewriteRule ^1528271975601.jpg$ https://i.imgur.com/ATHrQ0K.jpg [R=301,L]
+RewriteRule ^1528271975602.jpg$ https://i.imgur.com/7FKLDQ9.jpg [R=301,L]
+RewriteRule ^1528271976598.jpg$ https://i.imgur.com/uX3dlOy.jpg [R=301,L]
+RewriteRule ^1528271976599.jpg$ https://i.imgur.com/XuBcQGi.jpg [R=301,L]
+RewriteRule ^1528273003594.jpg$ https://i.imgur.com/m6jWXP3.jpg [R=301,L]
+RewriteRule ^1528273057882.jpg$ https://i.imgur.com/25muCdJ.jpg [R=301,L]
+RewriteRule ^esp_schematic.jpg$ https://i.imgur.com/0QnBlYx.jpg [R=301,L]
+RewriteRule ^1528273057883.png$ https://i.imgur.com/isqflBZ.png [R=301,L]
+RewriteRule ^1528273057884.png$ https://i.imgur.com/WjJtZZE.png [R=301,L]

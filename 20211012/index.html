@@ -1,0 +1,475 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="robots" content="index, follow">
+		<title>20211012 - 物聯網雲端應用</title>
+		<!-- cdn javascript and css -->
+		<script src="//code.jquery.com/jquery-3.1.1.min.js" type="text/javascript"></script>
+		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+		<style>
+		pre {
+			padding:5px;
+			font-family:monospace;
+			font-size:12px;
+		}
+		.blue {
+			color:blue;
+		}
+		.commit {
+			color:#888;
+		}
+		.yellow {
+			color:yellow;
+		}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>物聯網雲端應用</h1>
+			<p>楊皓程 2021/10/12</p>
+			<p>LINE: <a href="https://line.me/ti/p/GDmlEFtK1Y" target="_blank">peter30234</a> (加我，請註明是<span class="blue">陳永欽老師的學生</span>)</p>
+			<p><a href="https://line.me/ti/p/GDmlEFtK1Y" target="_blank"><img src="https://i.imgur.com/q1ZmPTv.jpg" style="width:200px;"></a></p>
+			<hr>
+			<div class="h3" style="display:flex;align-items:center;"><img src="https://i.imgur.com/sDSInju.png" style="width:1em;vertical-align:middle">&nbsp;檔案/工具</div>
+			<ol>
+				<li><a href="./20211012.pptx" target="_blank">PPT下載</a></li>
+				<li><a href="./adafruit.ipynb" target="_blank">Google Colab 筆記(adafruit.ipynb)下載</a></li>
+				<li><a href="https://chrome.google.com/webstore/detail/mqttbox/kaajoficamnjijhkeomgfljpicifbkaf" target="_blank">Chrome Extension MQTTBox</a></li>
+			</ol>
+			<div class="h3" style="display:flex;align-items:center;"><img src="https://i.imgur.com/sDSInju.png" style="width:1em;vertical-align:middle">&nbsp;Python Connect Adafruit MQTT Server</div>
+			<p style="color:blue;"><b>A. Adafruit.io</b></p>
+			<ul>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#a1" role="button" aria-expanded="false" aria-controls="a1">A-1. Install Python & pip Packages</a></b></p>
+<pre style="background:#000;color:#999;" class="collapse" id="a1">
+root@localhost:~# sudo apt update
+root@localhost:~# sudo apt upgrade
+root@localhost:~# sudo apt install -y vim python pip
+root@localhost:~# sudo pip install paho-mqtt
+root@localhost:~# sudo pip install paho
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#a2" role="button" aria-expanded="false" aria-controls="a2">A-2. adafruit_subscribe.py</a> <a href="./adafruit_subscribe.py.txt" target="_blank">下載</a></b></p>
+<pre style="background:#ffd;color:#000;" class="collapse" id="a2">
+<span class="commit"><i># -*- coding: utf-8 -*-</i></span>
+import paho.mqtt.client as mqtt
+
+<span class="commit"><i>#訂閱[hcyang0207/feeds/home.humi]</i></span>
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    client.subscribe("<span class="blue">hcyang0207/feeds/home.humi</span>")
+<span class="commit"><i>#收到訂閱</i></span>
+def on_message(client, userdata, msg):
+    print(msg.topic+" "+ msg.payload.decode('utf-8'))
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+client.username_pw_set("<span class="blue">hcyang0207</span>","<span class="blue">aio_BKwE178y7NDTg4K651**********</span>")
+client.connect("io.adafruit.com", 1883, 60)
+client.loop_forever()
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#a3" role="button" aria-expanded="false" aria-controls="a3">A-3. adafruit_publish.py</a> <a href="./adafruit_publish.py.txt" target="_blank">下載</a></b></p>
+<pre style="background:#ffd;color:#000;" class="collapse" id="a3">
+<span class="commit"><i># -*- coding: utf-8 -*-</i></span>
+import paho.mqtt.client as mqtt
+import random
+import json
+import time
+
+client = mqtt.Client()
+
+<span class="commit"><i># 設定登入帳號密碼</i></span>
+client.username_pw_set("<span class="blue">hcyang0207</span>","<span class="blue">aio_BKwE178y7NDTg4K651**********</span>")
+client.connect("io.adafruit.com", 1883, 60)
+
+while True:
+    <span class="commit"><i>#隨機濕度50~60</i></span>
+    value = random.randint(50,60)
+    <span class="commit"><i>#送出訊息</i></span>
+    payload = {"value":value}
+    print(payload)
+    <span class="commit"><i>#發送目的</i></span>
+    client.publish("<span class="blue">hcyang0207/feeds/home.humi</span>", json.dumps(payload))
+    <span class="commit"><i>#延遲5秒</i></span>
+    time.sleep(5)
+</pre>
+			</ul>
+			<div class="h3" style="display:flex;align-items:center;"><img src="https://i.imgur.com/sDSInju.png" style="width:1em;vertical-align:middle">&nbsp;Mosquitto-Client Tools Connect Adafruit MQTT Server</div>
+			<p style="color:blue;"><b>B. Adafruit.io</b></p>
+			<ul>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#b1" role="button" aria-expanded="false" aria-controls="b1">B-1. 安裝工具</a></b></p>
+<pre style="background:#000;color:#999;" class="collapse" id="b1">
+root@localhost:~# sudo apt update
+root@localhost:~# sudo apt upgrade
+root@localhost:~# sudo apt install -y mosquitto-clients
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#b2" role="button" aria-expanded="false" aria-controls="b2">B-2. mosquitto-client 測試 Adafruit Subscribe</a></b></p>
+<pre style="background:#000;color:#999;" class="collapse" id="b2">
+root@localhost:~# sudo mosquitto_sub -h io.adafruit.com -p 1883 -u <span class="yellow">hcyang0207</span> -P <span class="yellow">aio_BKwE178y7NDTg4K651**********</span> -t "<span class="yellow">hcyang0207/feeds/home.humi</span>" -v
+<div style="color:#fff">
+    hcyang0207/feeds/home.humi 50
+</div>
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#b3" role="button" aria-expanded="false" aria-controls="b3">B-3. mosquitto-client 測試 Adafruit Publish</a></b></p>
+<pre style="background:#000;color:#999;" class="collapse" id="b3">
+root@localhost:~# sudo mosquitto_pub -h io.adafruit.com -p 1883 -u <span class="yellow">hcyang0207</span> -P <span class="yellow">aio_BKwE178y7NDTg4K651**********</span> -t "<span class="yellow">hcyang0207/feeds/home.humi</span>" -m "<span class="yellow">{\"value\":50}</span>"
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#b4" role="button" aria-expanded="false" aria-controls="b4">B-4. MQTTBox 連線設定</a></b></p>
+				<div class="collapse" id="b4"><img src="https://i.imgur.com/Z0c78mi.jpg" width="100%" style="max-width:780px;"></div>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#b5" role="button" aria-expanded="false" aria-controls="b5">B-5. MQTTBox 測試設定</a></b></p>
+				<div class="collapse" id="b5"><img src="https://i.imgur.com/2LcCL7Y.jpg" width="100%" style="max-width:780px;"></div>
+			</ul>
+			<div class="h3" style="display:flex;align-items:center;"><img src="https://i.imgur.com/sDSInju.png" style="width:1em;vertical-align:middle">&nbsp;Ubuntu 21.04 MQTT Server 架設</div>
+			<p>適合用在自己管理的主機，電腦主機、Raspberry Pi、實體電腦等，雲端主機如AWS、GCP、Vultr、Linode...</p>
+			<p style="color:blue;"><b>C. 無安全性MQTT Server架設 + 測試</b></p>
+			<ul>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#c1" role="button" aria-expanded="false" aria-controls="c1">C-1. 架設</a></b></p>
+<pre style="background:#000;color:#999;" class="collapse" id="c1">
+root@localhost:~# sudo apt update
+root@localhost:~# sudo apt upgrade
+root@localhost:~# sudo apt install -y mosquitto mosquitto-clients vim
+root@localhost:~# sudo vim /etc/mosquitto/conf.d/test.conf
+<div style="color:#fff">
+   allow_anonymous true
+   listener 1883
+</div>
+root@localhost:~# sudo systemctl restart mosquitto
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#c2" role="button" aria-expanded="false" aria-controls="c2">C-2. mosquitto-client 測試 Subscribe</a></b></p>
+<pre style="background:#000;color:#999;" class="collapse" id="c2">
+root@localhost:~# sudo mosquitto_sub -h localhost -p 1883 -t "<span class="yellow">testchanel</span>" -v
+<div style="color:#fff">
+    testchanel Hello2 MQTT
+</div>
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#c3" role="button" aria-expanded="false" aria-controls="c3">C-3. mosquitto-client 測試 Publish</a></b></p>
+<pre style="background:#000;color:#999;" class="collapse" id="c3">
+root@localhost:~# sudo mosquitto_pub -h localhost -p 1883 -t "<span class="yellow">testchanel</span>" -m "<span class="yellow">Hello2 MQTT</span>"
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#c4" role="button" aria-expanded="false" aria-controls="c4">C-4. mqtt_subscribe.py</a> <a href="./mqtt_subscribe.py.txt" target="_blank">下載</a></b></p>
+<pre style="background:#ffd;color:#000;" class="collapse" id="c4">
+<span class="commit"><i># -*- coding: utf-8 -*-</i></span>
+import paho.mqtt.client as mqtt
+
+<span class="commit"><i>#訂閱[testchanel]</i></span>
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    client.subscribe("<span class="blue">testchanel</span>")
+<span class="commit"><i>#收到訂閱</i></span>
+def on_message(client, userdata, msg):
+    print(msg.topic+" "+ msg.payload.decode('utf-8'))
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect("localhost", 1883, 60)
+client.loop_forever()
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#c5" role="button" aria-expanded="false" aria-controls="c5">C-5. mqtt_publish.py</a> <a href="./mqtt_publish.py.txt" target="_blank">下載</a></b></p>
+<pre style="background:#ffd;color:#000;" class="collapse" id="c5">
+<span class="commit"><i># -*- coding: utf-8 -*-</i></span>
+import paho.mqtt.client as mqtt
+import random
+import json
+import time
+
+client = mqtt.Client()
+client.connect("localhost", 1883, 60)
+
+while True:
+    <span class="commit"><i>#隨機濕度50~60</i></span>
+    value = random.randint(50,60)
+    <span class="commit"><i>#送出訊息</i></span>
+    payload = {"value":value}
+    print(payload)
+    <span class="commit"><i>#發送目的</i></span>
+    client.publish("<span class="blue">testchanel</span>", json.dumps(payload))
+    <span class="commit"><i>#延遲5秒</i></span>
+    time.sleep(5)
+</pre>
+			</ul>
+			<br>
+			<p style="color:blue;"><b>D. 有安全性MQTT Server架設 + 測試</b></p>
+			<ul>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#d1" role="button" aria-expanded="false" aria-controls="d1">D-1. 架設</a></b></p>
+<pre style="background:#000;color:#999;" class="collapse" id="d1">
+root@localhost:~# sudo apt update
+root@localhost:~# sudo apt upgrade
+root@localhost:~# sudo apt install -y mosquitto mosquitto-clients vim
+root@localhost:~# sudo mosquitto_passwd -c /etc/mosquitto/passwd <span class="yellow">test</span>
+<div style="color:#fff">
+    Password: <span class="yellow">test123</span>
+    Reenter password: <span class="yellow">test123</span>
+</div>
+root@localhost:~# sudo vim /etc/mosquitto/conf.d/test.conf
+<div style="color:#fff">
+    allow_anonymous false
+    password_file /etc/mosquitto/passwd
+    listener 1883
+</div>
+root@localhost:~# sudo systemctl restart mosquitto
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#d2" role="button" aria-expanded="false" aria-controls="d2">D-2. mosquitto-client 測試 Subscribe</a></b></p>
+<pre style="background:#000;color:#999;" class="collapse" id="d2">
+root@localhost:~# sudo mosquitto_sub -h localhost -p 1883 -u <span class="yellow">test</span> -P <span class="yellow">test123</span> -t "<span class="yellow">testchanel</span>" -v
+<div style="color:#fff">
+    testchanel Hello2 MQTT
+</div>
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#d3" role="button" aria-expanded="false" aria-controls="d3">D-3. mosquitto-client 測試 Publish</a></b></p>
+<pre style="background:#000;color:#999;" class="collapse" id="d3">
+root@localhost:~# sudo mosquitto_pub -h localhost -p 1883 -u <span class="yellow">test</span> -P <span class="yellow">test123</span> -t "<span class="yellow">testchanel</span>" -m "<span class="yellow">Hello2 MQTT</span>"
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#d4" role="button" aria-expanded="false" aria-controls="d4">D-4. mqtt_auth_subscribe.py</a> <a href="./mqtt_auth_subscribe.py.txt" target="_blank">下載</a></b></p>
+<pre style="background:#ffd;color:#000;" class="collapse" id="d4">
+<span class="commit"><i># -*- coding: utf-8 -*-</i></span>
+import paho.mqtt.client as mqtt
+
+<span class="commit"><i>#訂閱[testchanel]</i></span>
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    client.subscribe("<span class="blue">testchanel</span>")
+<span class="commit"><i>#收到訂閱</i></span>
+def on_message(client, userdata, msg):
+    print(msg.topic+" "+ msg.payload.decode('utf-8'))
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+client.username_pw_set("<span class="blue">test</span>","<span class="blue">test123</span>")
+client.connect("localhost", 1883, 60)
+client.loop_forever()
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#d5" role="button" aria-expanded="false" aria-controls="d5">D-5. mqtt_auth_publish.py</a> <a href="./mqtt_auth_publish.py.txt" target="_blank">下載</a></b></p>
+<pre style="background:#ffd;color:#000;" class="collapse" id="d5">
+<span class="commit"><i># -*- coding: utf-8 -*-</i></span>
+import paho.mqtt.client as mqtt
+import random
+import json
+import time
+
+client = mqtt.Client()
+
+<span class="commit"><i># 設定登入帳號密碼</i></span>
+client.username_pw_set("<span class="blue">test</span>","<span class="blue">test123</span>")
+client.connect("localhost", 1883, 60)
+
+while True:
+    <span class="commit"><i>#隨機濕度50~60</i></span>
+    value = random.randint(50,60)
+    <span class="commit"><i>#送出訊息</i></span>
+    payload = {"value":value}
+    print(payload)
+    <span class="commit"><i>#發送目的</i></span>
+    client.publish("<span class="blue">testchanel</span>", json.dumps(payload))
+    <span class="commit"><i>#延遲5秒</i></span>
+    time.sleep(5)
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#d6" role="button" aria-expanded="false" aria-controls="d6">D-6. MQTTBox 連線設定</a></b></p>
+				<div class="collapse" id="d6"><img src="https://i.imgur.com/rsY75Gq.jpg" width="100%" style="max-width:780px;"></div>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#d7" role="button" aria-expanded="false" aria-controls="d7">D-7. MQTTBox 測試設定</a></b></p>
+				<div class="collapse" id="d7"><img src="https://i.imgur.com/mDClsod.jpg" width="100%" style="max-width:780px;"></div>
+			</ul>
+			<div class="h3" style="display:flex;align-items:center;"><img src="https://i.imgur.com/sDSInju.png" style="width:1em;vertical-align:middle">&nbsp;Colab 架設 MQTT Server + 測試</div>
+			<p>這個方式只能localhost本機測試，無法外部連線測試，適合新手練習。</p>
+			<p style="color:blue;"><b>E. 無安全性MQTT Server架設 + 測試</b></p>
+			<ul>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#e1" role="button" aria-expanded="false" aria-controls="e1">E-1. Colab 安裝套件</a></b></p>
+<pre style="background:#ccf;color:#111;" class="collapse" id="e1">
+!apt install mosquitto
+!pip install paho-mqtt
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#e2" role="button" aria-expanded="false" aria-controls="e2">E-2. 設定 mosquitto</a></b></p>
+<pre style="background:#ccf;color:#111;" class="collapse" id="e2">
+!echo "allow_anonymous true" > /etc/mosquitto/conf.d/test.conf
+!echo "listener 1883" >> /etc/mosquitto/conf.d/test.conf
+!cat /etc/mosquitto/conf.d/test.conf
+!service mosquitto restart
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#e3" role="button" aria-expanded="false" aria-controls="e3">E-3. MQTT測試程式</a></b></p>
+<pre style="background:#eef;color:#111;" class="collapse" id="e3">
+import paho.mqtt.client as mqtt
+import threading
+import random
+import json
+import time
+
+<span class="commit"><i>#訂閱</i></span>
+def on_connect(client, userdata, flags, rc):
+  print("Connected with result code "+str(rc))
+  client.subscribe("<span class="blue">testchanel</span>")
+
+<span class="commit"><i>#訊息</i></span>
+def on_message(client, userdata, msg):
+  print("[Subscribe]", "["+msg.topic+"] "+ msg.payload.decode('utf-8'))
+
+<span class="commit"><i>#推送</i></span>
+def test_publish():
+    for i in range(1,5):
+        time.sleep(1)
+        <span class="commit"><i>#隨機濕度50~60</i></span>
+        value = random.randint(50,60)
+        <span class="commit"><i>#送出訊息</i></span>
+        payload = {"value":value}
+        print("[Publish][<span class="blue">testchanel</span>]", payload)
+        <span class="commit"><i>#發送目的</i></span>
+        client.publish("<span class="blue">testchanel</span>", json.dumps(payload))
+
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect("localhost", 1883, 60)
+threading.Thread(target=test_publish).start()
+client.loop_forever()
+</pre>
+			</ul>
+			<p style="color:blue;"><b>F. 有安全性MQTT Server架設 + 測試</b></p>
+			<ul>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#f1" role="button" aria-expanded="false" aria-controls="f1">F-1. Colab 安裝套件</a></b></p>
+<pre style="background:#ccf;color:#111;" class="collapse" id="f1">
+!apt install mosquitto mosquitto-clients
+!pip install paho-mqtt
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#f2" role="button" aria-expanded="false" aria-controls="f2">F-2. 設定 mosquitto</a></b></p>
+<pre style="background:#ccf;color:#111;" class="collapse" id="f2">
+<span class="commit"><i>#設定MQTT</i></span>
+!echo "allow_anonymous false" > /etc/mosquitto/conf.d/test.conf
+!echo "password_file /etc/mosquitto/passwd" >> /etc/mosquitto/conf.d/test.conf
+!echo "listener 1883" >> /etc/mosquitto/conf.d/test.conf
+!cat /etc/mosquitto/conf.d/test.conf
+<span class="commit"><i>#建立密碼檔</i></span>
+!rm /etc/mosquitto/passwd
+!echo "" > /etc/mosquitto/passwd
+!mosquitto_passwd -b /etc/mosquitto/passwd <span class="blue">test</span> <span class="blue">test123</span>
+!cat /etc/mosquitto/passwd
+<span class="commit"><i>#重啟服務</i></span>
+!service mosquitto restart
+</pre>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#f3" role="button" aria-expanded="false" aria-controls="f3">F-3. MQTT測試程式</a></b></p>
+<pre style="background:#eef;color:#111;" class="collapse" id="f3">
+import paho.mqtt.client as mqtt
+import threading
+import random
+import json
+import time
+
+<span class="commit"><i>#訂閱</i></span>
+def on_connect(client, userdata, flags, rc):
+  print("Connected with result code "+str(rc))
+  client.subscribe("<span class="blue">testchanel</span>")
+
+<span class="commit"><i>#訊息</i></span>
+def on_message(client, userdata, msg):
+  print("[Subscribe]", "["+msg.topic+"] "+ msg.payload.decode('utf-8'))
+
+<span class="commit"><i>#推送</i></span>
+def test_publish():
+    for i in range(1,5):
+        time.sleep(1)
+        <span class="commit"><i>#隨機濕度50~60</i></span>
+        value = random.randint(50,60)
+        <span class="commit"><i>#送出訊息</i></span>
+        payload = {"value":value}
+        print("[Publish][<span class="blue">testchanel</span>]", payload)
+        <span class="commit"><i>#發送目的</i></span>
+        client.publish("<span class="blue">testchanel</span>", json.dumps(payload))
+
+client = mqtt.Client()
+client.username_pw_set("<span class="blue">test</span>","<span class="blue">test123</span>")
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect("localhost", 1883, 60)
+threading.Thread(target=test_publish).start()
+client.loop_forever()
+</pre>
+			</ul>
+			<div class="h3" style="display:flex;align-items:center;"><img src="https://i.imgur.com/sDSInju.png" style="width:1em;vertical-align:middle">&nbsp;ESP8266 Arduino 程式範例</div>
+			<ul>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#g1" role="button" aria-expanded="false" aria-controls="g1">G-1. Arduino IDE 安裝擴充套件 PubSubClient</a></b></p>
+				<div class="collapse" id="g1"><img src="https://i.imgur.com/mIFMtX0.jpg" width="100%" style="max-width:780px;"></div>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#g2" role="button" aria-expanded="false" aria-controls="g2">G-2. Arduino IDE 開發板管理員安裝 esp8266</a></b></p>
+				<div class="collapse" id="g2"><img src="https://i.imgur.com/qreY4fY.jpg" width="100%" style="max-width:780px;"></div>
+				<p><b><a class="btn btn-xs btn-primary" data-toggle="collapse" href="#g3" role="button" aria-expanded="false" aria-controls="g3">G-3. NodeMCU(ESP12) Publish to Adafruit</a></b></p>
+<pre style="background:#efe;color:#111;" class="collapse" id="g3">
+#include &lt;ESP8266WiFi.h&gt;
+#include &lt;PubSubClient.h&gt;
+
+<span class="commit"><i>// WiFi</i></span>
+const char *ssid = "<span class="blue">HCWifi</span>";          <span class="commit"><i>// Enter your WiFi SSID</i></span>
+const char *password = "<span class="blue">09*****716</span>";  <span class="commit"><i>// Enter WiFi password</i></span>
+
+<span class="commit"><i>// MQTT Broker</i></span>
+const char *mqtt_broker = "io.adafruit.com";
+const char *topic = "<span class="blue">hcyang0207/feeds/home.humi</span>";
+const char *mqtt_username = "<span class="blue">hcyang0207</span>";
+const char *mqtt_password = "<span class="blue">aio_BKwE178y7NDTg4K651**********</span>";
+const int mqtt_port = 1883;
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void setup() {
+    <span class="commit"><i>// Set software serial baud to 115200;</i></span>
+    Serial.begin(115200);
+    <span class="commit"><i>// connecting to a WiFi network</i></span>
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.println("Connecting to WiFi..");
+    }
+    Serial.println("Connected to the WiFi network");
+    <span class="commit"><i>// connecting to a mqtt broker</i></span>
+    client.setServer(mqtt_broker, mqtt_port);
+    client.setCallback(callback);
+    while (!client.connected()) {
+        String client_id = "esp8266-client-";
+        client_id += String(WiFi.macAddress());
+        Serial.printf("The client %s connects to the public mqtt broker\n", client_id.c_str());
+        if (client.connect(client_id.c_str(), mqtt_username, mqtt_password)) {
+            Serial.println("Public mqtt broker connected");
+        } else {
+            Serial.print("failed with state ");
+            Serial.print(client.state());
+            delay(2000);
+        }
+    }
+    <span class="commit"><i>// publish and subscribe</i></span>
+    client.publish(topic, "<span class="blue">{\"value\":60}</span>");
+    client.subscribe(topic);
+}
+
+void callback(char *topic, byte *payload, unsigned int length) {
+    Serial.print("Message arrived in topic: ");
+    Serial.println(topic);
+    Serial.print("Message:");
+    for (int i = 0; i &lt; length; i++) {
+        Serial.print((char) payload[i]);
+    }
+    Serial.println();
+    Serial.println("-----------------------");
+}
+
+void loop() {
+    client.loop();
+}
+</pre>
+			</ul>
+			<h3>參考文獻</h3>
+			<ol>
+				<li><a href="http://www.circuspi.com/index.php/2021/07/06/adafruit-io/" target="_blank">一次就學會使用Adafruit IO 平台！</a></li>
+				<li><a href="https://falcoyao.medium.com/x-4aa59db82bbc" target="_blank">線上溫濕度監測系統(上)</a></li>
+				<li><a href="https://sites.google.com/a/fssh.khc.edu.tw/let-s-make-robots/iot/nodemcu/iot-shi-zuo" target="_blank">Let's make robots - MQTT實作</a></li>
+				<li><a href="https://learn.adafruit.com/category/adafruit-io?total_count=74&total_verbiage=total+series" target="_blank">Adafruit Learning System</a></li>
+				<li><a href="https://vmaker.tw/archives/3730" target="_blank">如何安裝各類感測器的函式庫</a></li>
+				<li><a href="https://github.com/adafruit" target="_blank">Adafruit Industries - GitHub</a></li>
+				<li><a href="https://swf.com.tw/?p=1002" target="_blank">MQTT教學（一）：認識MQTT</a></li>
+				<li><a href="https://www.emqx.com/zh/blog/esp8266-connects-to-the-public-mqtt-broker" target="_blank">ESP8266 连接到免费的公共 MQTT 服务器</a></li>
+			</ol>
+		</div>
+		<br><br><br><br><br><br><br><br>
+	</body>
+</html>

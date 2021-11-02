@@ -1,0 +1,22 @@
+# -*- coding: utf-8 -*-
+import paho.mqtt.client as mqtt
+import random
+import json
+import time
+
+client = mqtt.Client()
+
+# 設定登入帳號密碼
+client.username_pw_set("test","test123")
+client.connect("localhost", 1883, 60)
+
+while True:
+    #隨機濕度50~60
+    value = random.randint(50,60)
+    #送出訊息
+    payload = {"value":value}
+    print(payload)
+    #發送目的
+    client.publish("testchanel", json.dumps(payload))
+    #延遲5秒
+    time.sleep(5)
