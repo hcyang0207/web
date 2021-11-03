@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+		<meta http-equiv="Cache-Control" content="no-cache"/>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<meta name="robots" content="index, follow"/>
+		<title>2019/04/16 課程內容</title>
+		<!-- cdn javascript and css -->
+		<script src="//code.jquery.com/jquery-3.1.1.min.js" type="text/javascript"></script>
+		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+	</head>
+	<body>
+		<table border="1" width="800" align="center" style="margin: 10px auto auto;font-size:12px;">.
+			<tr>
+				<td align="center" colspan="2" style="padding:5px;"><h2>2019/04/16 課程內容</h2></td>
+			</tr>
+			<tr>
+				<td style="padding:5px;width:140px;text-align:center" rowspan="1">伺服器 VPS</td>
+				<td style="padding:5px;">
+					<div><mark>Vultr</mark> - <a href="https://www.vultr.com/?ref=7853364-4F" target="_blank">https://www.vultr.com</a></div>
+					<div><mark>DigitalOcean</mark> - <a href="https://m.do.co/c/af14220a871f" target="_blank">https://digitalocean.com</a></div>
+					<div><mark>GCP</mark> - <a href="https://console.cloud.google.com/" target="_blank">https://console.cloud.google.com</a> (<a href="https://cloud.google.com/free/docs/gcp-free-tier" target="_blank">Free Tier</a>)</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="padding:5px;width:140px;text-align:center" rowspan="2">工具 Tools</td>
+				<td style="padding:5px;">
+				<mark>Notepad++</mark> - <a href="https://notepad-plus-plus.org/downloads/" target="_blank">npp.7.6.2.Installer.x64.exe</a><br>
+				<mark>Putty</mark> - <a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html" target="_blank">putty_v0.64.exe</a><br>
+				<mark>rsa private key</mark> - <a href="./downloads/testkey.ppk" target="_blank">testkey.ppk [for putty]</a><br>
+				<mark>rsa private key</mark> - <a href="./downloads/testkey" target="_blank">testkey</a><br>
+				<mark>rsa public key</mark> - <a href="./downloads/testkey.pub" target="_blank">testkey.pub</a><br>
+				<mark>WS</mark> - <a href="https://chrome.google.com/webstore/detail/simple-websocket-client/pfdhoblngboilpfeibdedpjgfnlcodoo/related?hl=zh-TW" target="_blank">Websocket Tool</a>
+				</td>
+			</tr>
+			<tr>
+				<td style="padding:5px;">
+					<div><mark>WinSCP</mark> - <a href="https://winscp.net/eng/download.php" target="_blank">WinSCP</a></div>
+					<div><mark>HC Public Key</mark> - <a href="./downloads/hcyang_public.key" target="_blank">hcyang_public.key</a></div>
+				</td>
+			</tr>
+			<tr>
+				<td style="padding:5px;width:140px;text-align:center" rowspan="2"></td>
+				<td style="padding:5px;"><mark>SSH</mark> - <a href="https://ithelp.ithome.com.tw/articles/10080136" target="_blank">ssh keygen (login without password)</a></td>
+			</tr>
+			<tr>
+				<td style="padding:5px;">
+					<p>OS: <mark>Ubuntu 18.04 x64</mark></p>
+					<p><mark>#Install</mark></p>
+					<p>
+						root@server:~# <mark>apt update</mark><br>
+						root@server:~# <mark>apt upgrade</mark><br>
+						root@server:~# <mark>apt install apache2 php php-mbstring php-cli php-gd php-json php-curl php-mysql php-mysqli -y</mark><br>
+						root@server:~# <mark>apt install unzip git golang wget curl mysql-server -y</mark><br><br>
+						root@server:~# <mark>service apache2 restart</mark><br>
+					</p>
+					<p><mark>#MySQL</mark></p>
+					</p>
+						root@server:~# <mark>mysql_secure_installation</mark> <br>
+						#<span style='color:blue;'>(<a href="https://www.itzgeek.com/how-tos/mini-howtos/securing-mysql-server-with-mysql_secure_installation.html" target="_blank">Details</a>, and don't install VALIDATE PASSWORD PLUGIN.)</span><br>
+						root@server:~# <mark>mysql -u root -p</mark><br>
+						mysql> <mark>CREATE USER 'hc'@'localhost' IDENTIFIED BY '123456789';</mark><br>
+						mysql> <mark>GRANT ALL PRIVILEGES ON *.* TO 'hc'@'localhost' WITH GRANT OPTION;</mark><br>
+						mysql> <mark>FLUSH PRIVILEGES;</mark><br>
+						mysql> <mark>quit</mark><br><br>
+					</p>
+					<p><mark>#phpMyAdmin</mark></p>
+					</p>
+						root@server:~# <mark>cd /var/www/html</mark><br>
+						root@test:/var/www/html# <mark>wget https://cumi.co/20190416/downloads/phpMyAdmin.zip</mark><br>
+						root@test:/var/www/html# <mark>unzip phpMyAdmin.zip</mark><br>
+						#<span style='color:blue;'>http://IP_Address/phpMyAdmin/index.php</span><br>
+					</p>
+					<p><mark>#APW Project - Golang</mark></p>
+					</p>
+						root@server:~# <mark>cd /var/www/html</mark><br>
+						root@test:/var/www/html# <mark>mkdir apw</mark><br>
+						root@test:/var/www/html# <mark>cd apw</mark><br>
+						root@test:/var/www/html/apw# <mark>wget https://cumi.co/20190416/downloads/apw.zip<br>
+						root@test:/var/www/html/apw# <mark>unzip apw.zip</mark><br>
+						root@test:/var/www/html/apw# <mark>go get -v golang.org/x/net/websocket</mark><br>
+						root@test:/var/www/html/apw# <mark>go build</mark><br>
+						root@test:/var/www/html/apw# <mark>nohup ./apw >> logs.txt 2>&1&</mark><br><br>
+						#<span style='color:blue;'>http://IP_Address/phpMyAdmin/index.php</span><br>
+						#建立資料庫: apw [utf8_bin]<br>
+						<img src="./downloads/1556609730034.jpg" style="border:1px dashed blue"><br><br>
+						#import <span style='color:blue;'><a href="https://cumi.co/20190416/downloads/apw.sql" target="_blank">apw.sql</a></span><br>
+						<img src="./downloads/1556609814547.jpg" style="border:1px dashed blue"><br><br>
+					</p>
+					<p><mark>#APW Project - Web</mark></p>
+					</p>
+						root@server:~# <mark>cd /var/www/html</mark><br>
+						root@test:/var/www/html# <mark>mkdir apw_web</mark><br>
+						root@test:/var/www/html# <mark>cd apw_web</mark><br>
+						root@test:/var/www/html/apw_web# <mark>wget https://cumi.co/20190416/downloads/apw_web.zip<br>
+						root@test:/var/www/html/apw_web# <mark>unzip apw_web.zip</mark><br>
+						root@test:/var/www/html/apw_web# <mark>chmod -c 777 ./templates_c</mark><br><br>
+						#修改檔案: /var/www/html/apw_web/assets/ajax.js [websocket ip & port]<br>
+						<img src="./downloads/1556609584468.jpg" style="border:1px dashed blue"><br><br>
+						#<span style='color:blue;'>http://IP_Address/apw_web</span><br>
+					</p>
+					<p><mark>#APW Project - Arduino</mark></p>
+					</p>
+						#修改檔案main.ino (IP, Port, Path)<br>
+						<img src="./downloads/1556609983496.jpg" style="border:1px dashed blue"><br><br>
+						#<a href="/20180611/arduino_esp8266.html" target="_blank">ESP-12F燒錄方式</a><br>
+					</p>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
