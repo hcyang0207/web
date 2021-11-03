@@ -12,6 +12,11 @@
 		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
 		<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" rel="stylesheet">
+		<script>
+		if (location.protocol != 'https:'){
+			location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
+		}
+		</script>
 	</head>
 	<body>
 		<table border="1" width="800" align="center" style="margin: 10px auto auto;font-size:12px;">.
